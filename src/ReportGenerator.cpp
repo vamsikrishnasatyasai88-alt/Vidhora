@@ -21,3 +21,26 @@ int main() {
 
     return 0;
 }
+
+
+#include <iostream>
+#include <fstream>
+using namespace std;
+
+void saveReading() {
+    float usage;
+
+    cout << "Enter electricity usage: ";
+    cin >> usage;
+
+    ofstream file("data/readings.txt", ios::app);
+
+    if (file.is_open()) {
+        file << usage << endl;
+        file.close();
+        cout << "Reading saved successfully.\n";
+    }
+    else {
+        cout << "Unable to open file.\n";
+    }
+}  
