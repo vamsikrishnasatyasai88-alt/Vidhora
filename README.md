@@ -1,127 +1,181 @@
-# ⚡ Vidhora – Electricity Consumption Analysis & Anomaly Detection
+# Vidhora — Smart Electricity Usage & Anomaly Analytics
 
-Vidhora is a **C++-based electricity consumption monitoring and analysis system** developed as a group project. The system allows users to record electricity consumption readings, analyze usage patterns, calculate total and average consumption, detect unusually high energy usage, and generate consumption reports.
-
-The project follows a **modular Object-Oriented Programming (OOP)** approach, separating different responsibilities such as energy reading, usage analysis, anomaly detection, file management, and report generation.
+Vidhora is a full-stack electricity consumption analytics application. A **React/TypeScript frontend** communicates exclusively with a **C++17 backend** that performs all statistical analysis, anomaly detection, pattern recognition, persistence, CSV processing, and search/sort logic.
 
 ---
 
-## 📌 Project Description
+## Architecture
 
-Electricity consumption varies depending on the usage of appliances and daily activities. Monitoring consumption manually can make it difficult to identify unusual or excessive energy usage.
+```
+React UI (Vite + TypeScript)
+        ↓
+  src/services/api.ts
+        ↓
+   HTTP/JSON (:8080)
+        ↓
+  C++ Backend (httplib)
+        ↓
+  C++ Analysis Engine
+        ↓
+  C++ Persistence (JSON file)
+        ↓
+   JSON response
+        ↓
+   React rendering
+```
 
-**Vidhora** provides a simple software-based solution to analyze electricity consumption data. Users can enter energy readings and appliance-level consumption values. The system processes the collected data, calculates consumption statistics, identifies abnormal usage, and generates a basic report.
+All of the following execute **inside C++**, never in the browser:
 
-The project demonstrates how **C++, OOP, file handling, data analysis, and anomaly detection** can be combined to create a practical electricity consumption analysis application.
-
----
-
-## 🎯 Objectives
-
-The main objectives of Vidhora are:
-
-- To record electricity consumption readings.
-- To calculate total electricity consumption.
-- To calculate average electricity consumption.
-- To analyze electricity usage over multiple readings.
-- To identify unusually high energy consumption.
-- To support appliance-wise consumption analysis.
-- To store consumption readings using file handling.
-- To generate electricity consumption reports.
-- To demonstrate modular and object-oriented C++ programming.
-
----
-
-## ✨ Key Features
-
-### ⚡ Electricity Consumption Recording
-
-Users can enter electricity consumption readings in **kilowatt-hours (kWh)** for analysis.
-
-### 🏠 Appliance-wise Consumption
-
-The system can work with consumption information for common appliances such as:
-
-- Air Conditioner
-- Fan
-- Lights
-- Refrigerator
-
-### 📊 Usage Analysis
-
-The system analyzes recorded readings and calculates:
-
-- Total consumption
-- Average consumption
-- Consumption patterns
-
-### 🚨 Anomaly Detection
-
-Vidhora includes an anomaly detection component that helps identify unusually high electricity consumption based on the expected usage level.
-
-### 💾 File Handling
-
-Electricity consumption readings can be stored in a text file so that the data can be retained and used for further analysis.
-
-### 📄 Report Generation
-
-The system generates a basic report containing electricity consumption statistics and usage insights.
-
-### 🧩 Modular Design
-
-The project is divided into multiple modules, making the code easier to understand, maintain, test, and extend.
+- Statistical metrics (average, min, max, std deviation, variance)
+- Baseline calculation (historical average / moving average)
+- Anomaly detection + severity classification
+- Sudden spike detection
+- Temporary vs persistent pattern recognition
+- Linear regression trend analysis
+- Category comparison matrix
+- Time-range filtering (ALL / WEEKLY / MONTHLY / CUSTOM)
+- Dataset processing and CSV import/export
+- Search and sort (server-side, via query params)
+- Settings and dataset persistence (JSON files on disk)
 
 ---
 
-## 🛠️ Tech Stack
+## Prerequisites
 
-| Technology | Purpose |
+| Dependency | Minimum Version | Notes |
+|---|---|---|
+| MSVC (Visual Studio) | 2019 or 2022 | C++17, `/std:c++17` |
+| CMake | 3.20+ | |
+| Node.js | 18+ | |
+| npm | 9+ | |
+
+Third-party C++ libraries are **vendored** under `backend/third_party/` — no external package manager needed:
+- `nlohmann/json` (single header)
+- `cpp-httplib` (single header)
+
+---
+
+## Backend: Build & Run
+
+### Configure (first time only)
+
+```powershell
+cmake -S backend -B backend/build -G "Visual Studio 17 2022" -A x64
+```
+
+### Build Release
+
+```powershell
+cmake --build backend/build --config Release
+```
+
+Output executables:
+```
+backend/build/bin/Release/vidhora_backend.exe
+backend/build/bin/Release/vidhora_tests.exe
+```
+
+### Run Tests
+
+```powershell
+backend/build/bin/Release/vidhora_tests.exe
+```
+
+Expected: `Results: 96 passed, 0 failed`
+
+### Start Backend
+
+```powershell
+backend/build/bin/Release/vidhora_backend.exe
+```
+
+The server listens on **port 8080** and prints:
+```
+Vidhora C++ Backend listening on port 8080
+```
+
+Data files are persisted at:
+```
+backend/build/bin/Release/data/
+```
+
+---
+
+## Frontend: Install & Run
+
+```powershell
+npm install
+npm run dev
+```
+
+The Vite dev server starts on **port 5173**.
+
+The Vite proxy (`vite.config.ts`) forwards all `/api/*` requests to `http://localhost:8080`.
+
+Open: [http://localhost:5173](http://localhost:5173)
+
+### Production Build
+
+```powershell
+npm run build
+```
+
+Output goes to `dist/`.
+
+---
+
+## Ports
+
+| Service | Port |
 |---|---|
-| **C++** | Core programming language |
-| **Object-Oriented Programming** | Program structure and modular design |
-| **File Handling** | Reading and storing consumption data |
-| **Data Analysis** | Calculation of total and average usage |
-| **Anomaly Detection** | Identification of unusually high consumption |
-| **Git & GitHub** | Version control and team collaboration |
+| C++ Backend | 8080 |
+| Vite Dev Server | 5173 |
+
+The backend must be running before starting the frontend. If the backend is unreachable, the app displays a clear error screen with restart instructions.
 
 ---
 
-## 🏗️ Project Architecture
+## API Overview
 
-The project is organized into separate components based on their responsibilities.
+All endpoints are under `/api/`.
 
-```text
-                     ┌──────────────────────┐
-                     │      User Input      │
-                     │ Electricity Readings │
-                     └───────────┬──────────┘
-                                 │
-                                 ▼
-                     ┌──────────────────────┐
-                     │   Energy Reading     │
-                     │       Module         │
-                     └───────────┬──────────┘
-                                 │
-                                 ▼
-                     ┌──────────────────────┐
-                     │    Usage Analyzer    │
-                     │ Total & Average Usage│
-                     └───────────┬──────────┘
-                                 │
-                                 ▼
-                     ┌──────────────────────┐
-                     │   Anomaly Detector   │
-                     │  Detect High Usage   │
-                     └───────────┬──────────┘
-                                 │
-                                 ▼
-                     ┌──────────────────────┐
-                     │   Report Generator   │
-                     │    Usage Summary     │
-                     └───────────┬──────────┘
-                                 │
-                                 ▼
-                     ┌──────────────────────┐
-                     │     File Manager     │
-                     │    Data Storage      │
-                     └──────────────────────┘
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/health` | Backend liveness check |
+| GET | `/api/dataset` | Full dataset + metadata |
+| POST | `/api/dataset/import` | Import CSV dataset |
+| POST | `/api/dataset/reset` | Restore default PJM dataset |
+| POST | `/api/analysis` | Run full C++ analysis pipeline |
+| GET | `/api/settings` | Fetch analysis settings |
+| PUT | `/api/settings` | Save analysis settings |
+| GET | `/api/readings` | Fetch readings (supports `?q=`, `?sortField=`, `?sortOrder=`) |
+| PUT | `/api/readings/:id` | Update a reading |
+| DELETE | `/api/readings/:id` | Delete a reading |
+| GET | `/api/export/csv` | Export dataset as CSV download |
+
+---
+
+## Default Dataset
+
+The included dataset is the **PJM Open Energy Dataset** — 365 daily electricity readings covering 2024-01-01 to 2024-12-30.
+
+- 365 records
+- 6 appliance category columns (AC, refrigerator, fans, lighting, washing machine, other)
+- The dataset can be reset at any time via Settings → "Restore Included PJM Dataset" or `POST /api/dataset/reset`
+
+---
+
+## Legacy TypeScript Files
+
+The following files remain in `src/` as migration reference material. They are **not imported by any production component** and do not execute at runtime:
+
+| File | Status |
+|---|---|
+| `src/services/analysisEngine.ts` | Reference only — superseded by C++ |
+| `src/engine/cppAnalysisEngine.ts` | Reference only — superseded by C++ |
+| `src/services/csvImporter.ts` | Reference only — superseded by C++ |
+| `src/services/dataStorage.ts` | Reference only — superseded by C++ |
+| `src/services/realDataset.ts` | Reference only — superseded by C++ |
+| `src/components/ImportDataset/ImportDatasetView.tsx` | Reference only — superseded by backend import UI in App.tsx |
+
+These can be deleted once the migration reference period is over.
