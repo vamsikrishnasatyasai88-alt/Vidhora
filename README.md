@@ -1,34 +1,45 @@
 Vidhora — Smart Electricity Usage & Anomaly Analytics
-C++ Concepts and Where to Find Them
+
+C++ Concepts and Where to Find Them:
 Vidhora uses a C++17 backend for electricity-data processing, analytics, and API handling. The following sections explain the relevant concepts and where to inspect the code. Verify exact filenames in the current repository before presenting them during a review.
-Classes and Objects
+
+Classes and Objects:
 Where to look: C++ source and header files under `backend/` and `include/`.
 Backend components can group related data and operations into classes. Objects are instances of those classes created while the application runs.
-Encapsulation
+
+Encapsulation:
 Where to look: Class declarations in `include/` and their implementations in `backend/`.
 Encapsulation groups data and related operations, while class interfaces control how other parts of the program access them.
-Abstraction
+
+Abstraction:
 Where to look: Backend API handlers under `backend/` and the frontend API client at `src/services/api.ts`.
 The frontend requests results through API endpoints without needing to know how the C++ analysis is implemented internally.
-Functions and Modular Programming
+
+Functions and Modular Programming:
 Where to look: C++ implementation files (`.cpp`) and headers (`.h` / `.hpp`) under `backend/` and `include/`.
 Separate functions and modules can handle analysis, validation, data processing, and request handling.
-STL Containers and Algorithms
+
+STL Containers and Algorithms:
 Where to look: C++ analysis and data-processing files under `backend/`.
 Standard Library containers and algorithms can be used to store, filter, sort, and process readings. Check the source code to identify the exact containers and algorithms used.
-File Handling
+
+File Handling:
 Where to look: C++ persistence and data-management files under `backend/`, along with runtime data under `data/` or the configured backend data directory.
 File operations support persistent data and CSV imports/exports.
-Input Validation and Error Handling
+
+Input Validation and Error Handling:
 Where to look: Backend API handlers and analysis functions under `backend/`.
 Validation and error handling help the application handle invalid requests or readings. Describe only the checks that are actually implemented.
-HTTP and JSON Processing
+
+HTTP and JSON Processing:
 Where to look: Backend HTTP/API implementation under `backend/` and the frontend API client at `src/services/api.ts`.
 `cpp-httplib` handles HTTP communication, while `nlohmann/json` supports JSON parsing and response generation.
-Testing
+
+Testing:
 Where to look: C++ test source files and the `vidhora_tests.exe` test target.
 Tests exercise backend behavior. Run the test executable to confirm the current pass/fail result.
-The Four Common OOP Principles
+
+The Four Common OOP Principles:
 Encapsulation: Grouping data and the operations that work on it, with controlled access.
 Abstraction: Exposing a clear interface while hiding implementation details.
 Inheritance: Defining a class based on another class.
