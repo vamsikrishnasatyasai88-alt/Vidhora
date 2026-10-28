@@ -99,10 +99,29 @@ set_target_properties(vidhora_tests PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
 )
 
+
+# ─────────────────────────────────────────────────────────────
+# Week 1 validation tests executable
+# ─────────────────────────────────────────────────────────────
+add_executable(week1_tests
+  tests/week1_validation_tests.cpp
+)
+
+target_include_directories(week1_tests PRIVATE ${VIDHORA_INCLUDE_DIR})
+
+if(WIN32)
+  target_link_libraries(week1_tests PRIVATE ws2_32)
+endif()
+
+set_target_properties(week1_tests PROPERTIES
+  RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+)
+
 # ─────────────────────────────────────────────────────────────
 enable_testing()
 add_test(NAME vidhora_unit_tests COMMAND vidhora_tests)
+add_test(NAME week1_validation_tests COMMAND week1_tests)
 
 message(STATUS "Vidhora C++ Backend configured (C++17, vendored httplib + nlohmann/json)")
 message(STATUS "  Backend exe : vidhora_backend")
-message(STATUS "  Tests exe   : vidhora_tests")
+message(STATUS "  Tests exe   : vidhora_tests, week1_tests")
