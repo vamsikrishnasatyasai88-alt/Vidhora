@@ -8,11 +8,13 @@ import {
   FileText,
   Settings as SettingsIcon,
   Zap,
-  X
+  X,
+  Calculator
 } from 'lucide-react';
 
 export type ActiveTab =
   | 'dashboard'
+  | 'bill-estimator'
   | 'import-dataset'
   | 'historical-data'
   | 'analysis'
@@ -37,6 +39,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'bill-estimator', label: 'Bill Estimator', icon: Calculator },
     { id: 'import-dataset', label: 'Import Dataset', icon: FolderUp },
     { id: 'historical-data', label: 'Historical Data', icon: Table },
     { id: 'analysis', label: 'Usage Analysis', icon: LineChart },

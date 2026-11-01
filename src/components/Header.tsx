@@ -23,6 +23,10 @@ export const Header: React.FC<HeaderProps> = ({
       title: 'Dashboard',
       subtitle: 'Electricity consumption overview and anomaly analysis',
     },
+    'bill-estimator': {
+      title: 'Bill Estimator',
+      subtitle: 'Electricity bill estimation and savings simulator powered by C++ backend',
+    },
     'import-dataset': {
       title: 'Import Dataset',
       subtitle: 'Load electricity consumption data for analysis',

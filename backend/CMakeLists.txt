@@ -39,6 +39,7 @@ set(VIDHORA_LIB_SOURCES
   src/services/dataset_generator.cpp
   src/services/csv_importer.cpp
   src/services/persistence.cpp
+  src/services/bill_calculator.cpp
   src/utils/json_helpers.cpp
 )
 
@@ -120,7 +121,30 @@ set_target_properties(week1_tests PROPERTIES
 # ─────────────────────────────────────────────────────────────
 enable_testing()
 add_test(NAME vidhora_unit_tests COMMAND vidhora_tests)
+# ─────────────────────────────────────────────────────────────
+# Bill Estimator & Savings Simulator unit tests
+# ─────────────────────────────────────────────────────────────
+add_executable(bill_tests
+  tests/test_bill_calculator.cpp
+)
+
+target_include_directories(bill_tests PRIVATE ${VIDHORA_INCLUDE_DIR})
+
+target_link_libraries(bill_tests PRIVATE
+  vidhora_lib
+  nlohmann_json
+)
+
+if(WIN32)
+  target_link_libraries(bill_tests PRIVATE ws2_32)
+endif()
+
+set_target_properties(bill_tests PROPERTIES
+  RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+)
+
 add_test(NAME week1_validation_tests COMMAND week1_tests)
+add_test(NAME bill_calculator_tests COMMAND bill_tests)
 
 message(STATUS "Vidhora C++ Backend configured (C++17, vendored httplib + nlohmann/json)")
 message(STATUS "  Backend exe : vidhora_backend")
