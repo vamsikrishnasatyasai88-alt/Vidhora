@@ -21,6 +21,7 @@ import { AnalysisView } from './components/Analysis/AnalysisView';
 import { AnomaliesView } from './components/Anomalies/AnomaliesView';
 import { ReportsView } from './components/Reports/ReportsView';
 import { SettingsView } from './components/Settings/SettingsView';
+import { BillEstimatorView } from './components/BillEstimator/BillEstimatorView';
 
 import type {
   ElectricityReading,
@@ -309,6 +310,13 @@ export function App() {
               readings={readings}
               metadata={metadata}
               setActiveTab={setActiveTab}
+            />
+          )}
+
+          {activeTab === 'bill-estimator' && (
+            <BillEstimatorView
+              metadata={metadata}
+              customRange={customRange}
             />
           )}
 

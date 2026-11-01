@@ -6,6 +6,7 @@
 #include "services/persistence.h"
 #include "services/csv_importer.h"
 #include "services/dataset_generator.h"
+#include "services/bill_calculator.h"
 #include "analysis/analysis_engine.h"
 #include "utils/json_helpers.h"
 #include <httplib.h>
@@ -177,6 +178,61 @@ void run_server(const std::string& host, int port) {
         }
     });
 
+    // ── POST /api/bill/estimate ──────────────────────────────────────────────
+    svr.Post("/api/bill/estimate", [](const httplib::Request& req, httplib::Response& res) {
+        try {
+            if (req.body.empty()) {
+                error_response(res, 400, "Request body is empty");
+                return;
+            }
+
+            nlohmann::json j;
+            try {
+                j = nlohmann::json::parse(req.body);
+            } catch (const std::exception& e) {
+                error_response(res, 400, std::string("Malformed JSON body: ") + e.what());
+                return;
+            }
+
+            BillCalculationInput input = bill_input_from_json(j);
+
+            std::string validationError;
+            if (!BillCalculator::validate_input(input, validationError)) {
+                error_response(res, 400, validationError);
+                return;
+            }
+
+            std::vector<ElectricityReading> readings;
+            {
+                std::lock_guard<std::mutex> lock(g_mutex);
+                readings = g_readings;
+            }
+
+            // Filter readings if a specific time mode or custom date range is requested
+            std::vector<ElectricityReading> evaluatedReadings;
+            TimeRangeMode mode = parse_time_mode(input.timeRangeMode);
+            if (mode != TimeRangeMode::ALL || (!input.startDate.empty() && !input.endDate.empty())) {
+                CustomDateRange customRange;
+                customRange.startDate = input.startDate;
+                customRange.endDate   = input.endDate;
+                if (!input.startDate.empty() && !input.endDate.empty()) {
+                    mode = TimeRangeMode::CUSTOM;
+                }
+                FilterResult fr = filter_readings_by_time_range(readings, mode, customRange);
+                evaluatedReadings = fr.filteredReadings;
+            } else {
+                evaluatedReadings = readings;
+            }
+
+            BillCalculator calculator;
+            BillCalculationResult result = calculator.calculate(evaluatedReadings, input);
+
+            json_response(res, 200, bill_result_to_json(result));
+        } catch (const std::exception& e) {
+            error_response(res, 500, std::string("Bill estimation error: ") + e.what());
+        }
+    });
+
     // ── GET /api/settings ────────────────────────────────────────────────────
     svr.Get("/api/settings", [](const httplib::Request&, httplib::Response& res) {
         std::lock_guard<std::mutex> lock(g_mutex);
@@ -302,6 +358,7 @@ void run_server(const std::string& host, int port) {
               << "  GET  /api/dataset\n"
               << "  POST /api/dataset/import\n"
               << "  POST /api/analysis\n"
+              << "  POST /api/bill/estimate\n"
               << "  GET  /api/settings\n"
               << "  PUT  /api/settings\n"
               << "  GET  /api/readings\n"

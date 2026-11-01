@@ -1,5 +1,6 @@
 #pragma once
 #include "models/types.h"
+#include "models/bill_models.h"
 #include <nlohmann/json.hpp>
 #include <iomanip>
 #include <sstream>
@@ -245,6 +246,90 @@ inline nlohmann::json analysis_results_to_json(const AnalysisResults& r) {
         {"endDate",   r.timeRangeInfo.endDate}
     };
     j["hasCategories"] = r.hasCategories;
+    return j;
+}
+
+// ─── Bill Calculation JSON conversions ───────────────────────────────────────
+inline BillCalculationInput bill_input_from_json(const nlohmann::json& j) {
+    BillCalculationInput input;
+    input.tariffPerKwh        = j.value("tariffPerKwh", 0.0);
+    input.fixedMonthlyCharge  = j.value("fixedMonthlyCharge", 0.0);
+    input.additionalCharges   = j.value("additionalCharges", 0.0);
+    input.isAdditionalChargeMonthly = j.value("isAdditionalChargeMonthly", true);
+    input.daysInBillingMonth  = j.value("daysInBillingMonth", 30);
+    input.timeRangeMode       = j.value("timeRangeMode", j.value("billingPeriod", "ALL"));
+    input.startDate           = j.value("startDate", "");
+    input.endDate             = j.value("endDate", "");
+
+    if (j.contains("reductionPercentages") && j["reductionPercentages"].is_array()) {
+        input.reductionPercentages.clear();
+        for (const auto& item : j["reductionPercentages"]) {
+            if (item.is_number()) {
+                input.reductionPercentages.push_back(item.get<double>());
+            }
+        }
+        if (input.reductionPercentages.empty()) {
+            input.reductionPercentages = {10.0, 20.0, 30.0};
+        }
+    }
+
+    if (j.contains("customReductionPercent") && j["customReductionPercent"].is_number()) {
+        input.customReductionPercent = j["customReductionPercent"].get<double>();
+    }
+
+    // Support nested customRange object if provided
+    if (j.contains("customRange") && j["customRange"].is_object()) {
+        if (input.startDate.empty()) input.startDate = j["customRange"].value("startDate", "");
+        if (input.endDate.empty()) input.endDate = j["customRange"].value("endDate", "");
+    }
+
+    return input;
+}
+
+inline nlohmann::json savings_simulation_to_json(const SavingsSimulationResult& s) {
+    return {
+        {"reductionPercentage",     s.reductionPercentage},
+        {"reducedConsumption",      s.reducedConsumption},
+        {"newEstimatedBill",        s.newEstimatedBill},
+        {"estimatedSavings",        s.estimatedSavings},
+        {"projectedMonthlySavings", s.projectedMonthlySavings},
+        {"projectedYearlySavings",  s.projectedYearlySavings}
+    };
+}
+
+inline nlohmann::json bill_result_to_json(const BillCalculationResult& r) {
+    nlohmann::json j;
+    j["totalConsumption"]            = r.totalConsumption;
+    j["observedDays"]                = r.observedDays;
+    j["validReadingsCount"]          = r.validReadingsCount;
+    j["tariffPerKwh"]                = r.tariffPerKwh;
+    j["energyCharges"]               = r.energyCharges;
+    j["fixedCharges"]                = r.fixedCharges;
+    j["additionalCharges"]           = r.additionalCharges;
+    j["isAdditionalChargeMonthly"]   = r.isAdditionalChargeMonthly;
+    j["billingCycles"]               = r.billingCycles;
+    j["periodFixedCharges"]          = r.periodFixedCharges;
+    j["periodAdditionalCharges"]     = r.periodAdditionalCharges;
+    j["estimatedBill"]               = r.estimatedBill;
+    j["averageDailyConsumption"]     = r.averageDailyConsumption;
+    j["averageDailyCost"]            = r.averageDailyCost;
+    j["projectedMonthlyConsumption"] = r.projectedMonthlyConsumption;
+    j["projectedMonthlyBill"]        = r.projectedMonthlyBill;
+    j["projectedYearlyConsumption"]  = r.projectedYearlyConsumption;
+    j["projectedYearlyBill"]         = r.projectedYearlyBill;
+    j["daysInBillingMonth"]          = r.daysInBillingMonth;
+    j["isReliableMonthlyEstimate"]   = r.isReliableMonthlyEstimate;
+    j["reliabilityReason"]           = r.reliabilityReason;
+    j["billingPeriodLabel"]          = r.billingPeriodLabel;
+    j["startDate"]                   = r.startDate;
+    j["endDate"]                     = r.endDate;
+
+    j["savingsSimulations"] = nlohmann::json::array();
+    for (const auto& s : r.savingsSimulations) {
+        j["savingsSimulations"].push_back(savings_simulation_to_json(s));
+    }
+
+    j["calculationAssumptions"] = r.calculationAssumptions;
     return j;
 }
 

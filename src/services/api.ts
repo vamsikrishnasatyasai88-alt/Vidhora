@@ -15,6 +15,14 @@ import type {
   CSVParseResult,
 } from '../types/electricity';
 
+import type {
+  BillEstimateRequest,
+  BillEstimateResponse,
+  SavingsSimulation,
+} from '../types/bill';
+
+export type { BillEstimateRequest, BillEstimateResponse, SavingsSimulation };
+
 // Vite dev proxy maps /api/* → http://localhost:8080/api/*
 // In production the C++ backend serves on the configured base URL.
 const API_BASE = '/api';
@@ -155,6 +163,17 @@ export async function downloadExportCSV(): Promise<void> {
   a.download = 'vidhora_export.csv';
   a.click();
   URL.revokeObjectURL(url);
+}
+
+// ─── Bill Estimator & Savings Simulator ──────────────────────────────────────
+
+export async function calculateBillEstimate(
+  request: BillEstimateRequest
+): Promise<BillEstimateResponse> {
+  return apiFetch<BillEstimateResponse>('/bill/estimate', {
+    method: 'POST',
+    body: JSON.stringify(request),
+  });
 }
 
 // ─── Fallback: produce a CSVParseResult shape from backend import response ────
