@@ -239,7 +239,9 @@ export function App() {
     return (
       <div className="flex min-h-screen bg-[#0b0f17] text-slate-100 font-sans items-center justify-center p-8">
         <div className="max-w-lg space-y-4 text-center">
-          <div className="text-5xl">⚠️</div>
+          <div className="w-14 h-14 rounded-2xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center mx-auto overflow-hidden p-1 shadow-lg shadow-teal-500/5">
+            <img src="/vidhora-logo.png" alt="Vidhora Logo" className="w-full h-full object-contain" />
+          </div>
           <h1 className="text-xl font-bold text-rose-400">C++ Backend Unreachable</h1>
           <pre className="text-xs text-slate-400 bg-slate-900 p-4 rounded-lg text-left whitespace-pre-wrap border border-slate-800">
             {backendError}
@@ -265,7 +267,10 @@ export function App() {
     return (
       <div className="flex min-h-screen bg-[#0b0f17] text-slate-100 font-sans items-center justify-center">
         <div className="text-center space-y-3">
-          <div className="w-8 h-8 border-2 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <div className="w-12 h-12 rounded-xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center mx-auto overflow-hidden p-1 shadow-md">
+            <img src="/vidhora-logo.png" alt="Vidhora Logo" className="w-full h-full object-contain animate-pulse" />
+          </div>
+          <div className="w-6 h-6 border-2 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
           <p className="text-sm text-slate-400 font-mono">Connecting to C++ backend…</p>
         </div>
       </div>
