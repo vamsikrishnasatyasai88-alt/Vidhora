@@ -7,7 +7,7 @@ import {
   AlertTriangle,
   FileText,
   Settings as SettingsIcon,
-  Zap,
+
   X,
   Calculator
 } from 'lucide-react';
@@ -63,8 +63,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Brand Header — Clean without PRO badge */}
       <div className="p-5 border-b border-slate-800/80 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-teal-500/10 text-teal-400 border border-teal-500/20 flex items-center justify-center shrink-0">
-            <Zap className="w-4 h-4" />
+          <div className="w-9 h-9 rounded-lg bg-teal-500/10 border border-teal-500/20 flex items-center justify-center shrink-0 overflow-hidden p-0.5 shadow-sm">
+            <img
+              src="/vidhora-logo.png"
+              alt="Vidhora Logo"
+              className="w-full h-full object-contain rounded-md"
+            />
           </div>
           <div>
             <h1 className="text-base font-bold text-white font-display tracking-tight">Vidhora</h1>
